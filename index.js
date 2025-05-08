@@ -36,7 +36,16 @@ function detectPackageManager() {
 /* ═════════ REST handler ═════════ */
 
 async function generateRestClient(openapiUrl) {
-  const outDir = path.resolve(process.cwd(), "api-client");
+  const { outDir } = await prompts({
+    type: "text",
+    name: "outDir",
+    message: "Enter the output directory for the generated client",
+    initial: "api",
+    validate: (v) => (v.trim() ? true : "Value required"),
+  });
+
+  if (!outDir) throw new Error("No output directory provided");
+  const outDirPath = path.resolve(process.cwd(), outDir);
 
   console.log(chalk.cyan("\nGenerating TypeScript Axios client …"));
   await execa(
