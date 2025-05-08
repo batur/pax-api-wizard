@@ -12,7 +12,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@openapitools/openapi-generator-cli": "^2.20.0",
     "boxen": "^8.0.1",
     "execa": "^9.5.2",
     "figlet": "^1.8.1",

@@ -1,13 +1,17 @@
 #!/usr/bin/env node
+// ESM imports
 import boxen from "boxen";
-import figlet from "figlet";
 import chalk from "chalk";
+import figlet from "figlet";
 import prompts from "prompts";
-
 import { execa } from "execa";
+import fs from "node:fs";
+import path from "node:path";
 
-function renderHeader() {
-  return console.log(
+/* ═════════ UI helpers ═════════ */
+
+function header() {
+  console.log(
     boxen(figlet.textSync("API Wizard"), {
       padding: 1,
       borderStyle: "round",
@@ -15,63 +19,64 @@ function renderHeader() {
       dimBorder: true,
     })
   );
+  console.log(
+    chalk.cyan("A CLI tool to generate API clients & docs with ease.\n")
+  );
 }
 
-function renderDescription() {
-  return console.log(
-    chalk.cyan(
-      "A CLI tool to generate API endpoints and documentation with ease."
+/* ═════════ package-manager detection ═════════ */
+
+function detectPackageManager() {
+  const cwd = process.cwd();
+  if (fs.existsSync(path.join(cwd, "pnpm-lock.yaml"))) return "pnpm";
+  if (fs.existsSync(path.join(cwd, "yarn.lock"))) return "yarn";
+  return "npm";
+}
+
+/* ═════════ REST handler ═════════ */
+
+async function generateRestClient(openapiUrl) {
+  const outDir = path.resolve(process.cwd(), "api-client");
+
+  console.log(chalk.cyan("\nGenerating TypeScript Axios client …"));
+  await execa(
+    "openapi-generator-cli",
+    [
+      "generate",
+      "-i",
+      openapiUrl,
+      "-g",
+      "typescript-axios",
+      "-o",
+      outDir,
+      "--skip-validate-spec", // handy for public specs
+    ],
+    { stdio: "inherit" }
+  );
+
+  // install axios into the caller’s project
+  const pm = detectPackageManager();
+  const installCmd =
+    pm === "yarn"
+      ? ["add", "axios"]
+      : ["add", "axios", pm === "npm" ? "--save" : ""];
+
+  console.log(
+    chalk.cyan(`\nInstalling runtime dependency (axios) via ${pm} …`)
+  );
+  await execa(pm, installCmd.filter(Boolean), { stdio: "inherit" });
+
+  console.log(
+    chalk.green(
+      `\n✅ Client generated in ${path.relative(process.cwd(), outDir)}`
     )
   );
 }
 
-async function generateOpenAPIDocs(endpoint) {
-  console.log(chalk.cyan("Generating OpenAPI documentation..."));
-  await execa(
-    "openapi-generator-cli",
-    ["generate", "-i", endpoint, "-g", "typescript-axios", "-o", "./api-docs"],
-    { stdio: "inherit" }
-  );
+/* ═════════ prompt flow ═════════ */
 
-  return console.log("✅ TypeScript Axios generated! Happy coding!");
-}
-
-function RestAPIHandler() {
-  return prompts({
-    type: "text",
-    name: "endpoint",
-    message: "Enter the REST API endpoint URL or path:",
-  }).then((response) => {
-    if (response.endpoint) {
-      console.log(
-        chalk.green(`Generated REST API endpoint: ${response.endpoint}`)
-      );
-      generateOpenAPIDocs(response.endpoint);
-    } else {
-      console.log(chalk.red("No endpoint provided."));
-    }
-  });
-}
-
-function handleSelection(selection) {
-  switch (selection) {
-    case "rest":
-      console.log(chalk.green("You selected REST API."));
-      RestAPIHandler();
-      break;
-    case "graphql":
-      console.log(chalk.green("You selected GraphQL API."));
-      break;
-    case "grpc":
-      console.log(chalk.green("You selected gRPC API."));
-      break;
-    default:
-      console.log(chalk.red("Invalid selection."));
-  }
-}
-
-function renderPrompts() {
-  return prompts({
+async function askApiType() {
+  const { apiType } = await prompts({
     type: "select",
     name: "apiType",
     message: "Select the API type you want to generate:",
@@ -81,19 +86,46 @@ function renderPrompts() {
       { title: "gRPC", value: "grpc" },
     ],
     initial: 0,
-  }).then((response) => {
-    if (response.apiType) {
-      handleSelection(response.apiType);
-    } else {
-      console.log(chalk.red("No selection made."));
-    }
   });
+
+  if (!apiType) throw new Error("No selection made");
+  return apiType;
 }
 
-function main() {
-  renderHeader();
-  renderDescription();
-  renderPrompts();
+async function askRestEndpoint() {
+  const { endpoint } = await prompts({
+    type: "text",
+    name: "endpoint",
+    message: "Enter the REST API spec URL or file path:",
+    validate: (v) => (v.trim() ? true : "Value required"),
+  });
+  if (!endpoint) throw new Error("No endpoint provided");
+  return endpoint.trim();
 }
 
-main();
+/* ═════════ main ═════════ */
+
+(async () => {
+  try {
+    header();
+    const type = await askApiType();
+
+    switch (type) {
+      case "rest":
+        const spec = await askRestEndpoint();
+        await generateRestClient(spec);
+        break;
+
+      case "graphql":
+        console.log(chalk.yellow("GraphQL generator coming soon!"));
+        break;
+
+      case "grpc":
+        console.log(chalk.yellow("gRPC generator coming soon!"));
+        break;
+    }
+  } catch (err) {
+    console.error(chalk.red(`\n✖ ${err.message}`));
+    process.exit(1);
+  }
+})();
