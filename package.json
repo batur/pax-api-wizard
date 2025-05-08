@@ -1,0 +1,24 @@
+{
+  "name": "pax-api-wizard",
+  "version": "0.0.1",
+  "description": "Interactive CLI to set up front-end API tooling (REST / GraphQL / tRPC)",
+  "author": "Batur Akkurt",
+  "type": "module",
+  "main": "index.js",
+  "bin": "./index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.20.0",
+    "boxen": "^8.0.1",
+    "execa": "^9.5.2",
+    "figlet": "^1.8.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
