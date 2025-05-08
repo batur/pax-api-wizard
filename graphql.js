@@ -50,6 +50,17 @@ async function generateGraphQLClient(graphqlUrl) {
 
   await handleCodegenTemplatete(outDir, graphqlUrl);
 
+  const codegenDeps = [
+    "@graphql-codegen/cli",
+    "graphql",
+    "@graphql-codegen/typescript",
+    "@graphql-codegen/typescript-operations",
+    "@graphql-codegen/typed-document-node",
+    "@graphql-codegen/client-preset",
+  ];
+
+  await execa(pm, ["add", "-D", ...codegenDeps], { stdio: "inherit" });
+
   await execa("graphql-codegen", {
     stdio: "inherit",
   });
