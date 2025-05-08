@@ -50,7 +50,7 @@ async function generateGraphQLClient(graphqlUrl) {
 
   await handleCodegenTemplatete(outDir, graphqlUrl);
 
-  await execa("graphql-codegen", ["generate", "--config", "codegen.js"], {
+  await execa("graphql-codegen", {
     stdio: "inherit",
   });
 
