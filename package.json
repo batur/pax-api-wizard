@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "description": "Interactive CLI to set up front-end API tooling (REST / GraphQL / tRPC)",
   "author": "Batur Akkurt",
+  "keywords": [
+    "cli",
+    "api",
+    "rest",
+    "graphql",
+    "trpc",
+    "typescript"
+  ],
   "type": "module",
   "main": "index.js",
   "bin": "./index.js",
