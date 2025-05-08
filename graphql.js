@@ -4,6 +4,7 @@ import { execa } from "execa";
 import chalk from "chalk";
 import fs from "node:fs";
 
+import { detectPackageManager } from "./utils.js";
 import contents from "./contents.js";
 import {
   configTemplate,
@@ -39,6 +40,7 @@ async function handleCodegenTemplatete(outDirPath, graphqlUrl) {
 }
 
 async function generateGraphQLClient(graphqlUrl) {
+  const pm = detectPackageManager();
   const { outDir } = await prompts({
     type: "text",
     name: "outDir",
