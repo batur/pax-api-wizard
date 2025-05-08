@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import boxen from "boxen";
 import figlet from "figlet";
 import chalk from "chalk";
