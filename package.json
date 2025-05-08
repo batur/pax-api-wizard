@@ -1,6 +1,6 @@
 {
   "name": "pax-api-wizard",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Interactive CLI to set up front-end API tooling (REST / GraphQL / tRPC)",
   "author": "Batur Akkurt",
   "type": "module",
