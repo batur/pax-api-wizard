@@ -6,6 +6,7 @@ import prompts from "prompts";
 import { generateRestClient, askRestEndpoint } from "./rest.js";
 import { header } from "./utils.js";
 import contents from "./contents.js";
+import { askGraphQLSchemaEndpoint, generateGraphQLClient } from "./graphql.js";
 
 async function askApiType() {
   const { apiType } = await prompts({
@@ -39,12 +40,13 @@ async function askApiType() {
 
   switch (type) {
     case "rest":
-      const spec = await askRestEndpoint();
-      await generateRestClient(spec);
+      const restSpec = await askRestEndpoint();
+      await generateRestClient(restSpec);
       break;
 
     case "graphql":
-      console.log(chalk.yellow("GraphQL generator coming soon!"));
+      const graphqlSpec = await askGraphQLSchemaEndpoint();
+      await generateGraphQLClient(graphqlSpec);
       break;
 
     case "grpc":

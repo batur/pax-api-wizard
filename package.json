@@ -8,7 +8,8 @@
   "bin": "./index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "generate": "graphql-codegen"
   },
   "license": "MIT",
   "dependencies": {
@@ -17,9 +18,15 @@
     "boxen": "^8.0.1",
     "execa": "^9.5.2",
     "figlet": "^1.8.1",
+    "graphql": "^16.11.0",
     "prompts": "^2.4.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.6",
+    "@graphql-codegen/client-preset": "^4.8.1",
+    "@graphql-codegen/typed-document-node": "^5.1.1",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
     "nodemon": "^3.1.10"
   }
 }
