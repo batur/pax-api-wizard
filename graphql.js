@@ -28,12 +28,14 @@ async function handleCodegenTemplatete(outDirPath, graphqlUrl) {
   };
 
   const codegenContent = `
-  const config = ${JSON.stringify(template, null, 2)};
+  import { CodegenConfig } from "@graphql-codegen/cli";
+
+  const config: CodegenConfig = ${JSON.stringify(template, null, 2)};
 
   export default config;
   `;
 
-  await fs.promises.writeFile("codegen.js", codegenContent);
+  await fs.promises.writeFile("codegen.ts", codegenContent);
 }
 
 async function generateGraphQLClient(graphqlUrl) {
